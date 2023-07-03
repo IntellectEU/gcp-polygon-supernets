@@ -1,0 +1,33 @@
+---
+ansible_ssh_common_args: "-o ProxyCommand='gcloud compute start-iap-tunnel %h %p --listen-on-stdin --zone {{ zone }} --project {{ project }}'"
+
+# deployment_name: "{{ clean_deploy_title }}"
+base_dn: "{{ deployment_name }}.edge.polygon.private"
+base_id: "{{ deployment_name }}-{{ environment }}"
+
+node_name: "{{ hostvars[inventory_hostname].labels.node_name }}"
+edge_domain: "{{ base_dn }}"
+node_hostname: "{{ node_name }}.{{ edge_domain }}"
+
+edge_home_dir: /var/lib/edge
+edge_user: edge
+
+is_validator: false
+
+loadtest_account: "0x85da99c8a7c2c95964c8efd687e95e632fc533d6"
+
+edge_grpc_port: 10000
+edge_p2p_port: 10001
+edge_jsonrpc_port: 10002
+
+edge_prometheus_port: 9091
+node_exporter_port: 9092
+node_exporter_web_listen_address: 127.0.0.1:{{ node_exporter_port }}
+
+haproxy_port: 10222
+
+# This is the configuration related to mounting a separate device
+storage_device_name: nvme1n1
+storage_device_location: /dev/{{ storage_device_name }}
+storage_mount_point: "{{ edge_home_dir }}"
+storage_partition_name: State Data

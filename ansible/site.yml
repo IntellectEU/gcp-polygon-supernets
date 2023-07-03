@@ -1,0 +1,42 @@
+- name: Gather facts
+  hosts: all
+  become: true
+  tags:
+    - always
+  tasks:
+    - name: Gather facts
+      ansible.builtin.gather_facts:
+
+- name: Install common role
+  hosts: all
+  become: true
+  tags:
+    - init
+  roles:
+    - common
+
+- name: Install rootchain-server role
+  hosts: geth
+  become: true
+  tags:
+    - geth
+  roles:
+    - rootchain-server
+
+- name: Install mounted-storage and edge roles
+  hosts: fullnode:validator
+  become: true
+  tags:
+    - edge
+  roles:
+    - mounted-storage
+    - edge
+
+- name: Install haproxy role
+  hosts: fullnode:validator
+  become: true
+  tags:
+    - haproxy
+  roles:
+    - haproxy
+

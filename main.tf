@@ -3,7 +3,6 @@
 variable "project" {
   description = "The project where we want to deploy"
   type        = string
-  default     = "polygon-060623"
 }
 variable "base_instance_type" {
   description = "The type of instance that we're going to use"
@@ -32,24 +31,6 @@ variable "devnet_key_value" {
   description = "The public key value to use for the ssh key. Required when create_ssh_key is false"
   type        = string
   default     = ""
-}
-
-variable "devnet_private_subnet" {
-  description = "The cidr block for the private subnet in our VPC"
-  type        = list(string)
-  default     = ["10.10.64.0/22", "10.10.68.0/22", "10.10.72.0/22", "10.10.76.0/22"]
-}
-
-variable "devnet_public_subnet" {
-  description = "The cidr block for the public subnet in our VPC"
-  type        = list(string)
-  default     = ["10.10.0.0/22", "10.10.4.0/22", "10.10.8.0/22", "10.10.12.0/22"]
-}
-
-variable "devnet_vpc_block" {
-  description = "The cidr block for our VPC"
-  type        = string
-  default     = "10.10.0.0/16"
 }
 
 variable "environment" {
@@ -91,7 +72,7 @@ variable "network_acl" {
 variable "node_storage" {
   description = "The size of the storage disk attached to full nodes and validators"
   type        = number
-  default     = 10
+  default     = 40
 }
 
 variable "rootchain_rpc_port" {
@@ -127,7 +108,7 @@ variable "region" {
 variable "validator_count" {
   description = "The number of validators that we're going to deploy"
   type        = number
-  default     = 4
+  default     = 2
 }
 
 variable "zones" {
@@ -141,17 +122,17 @@ variable "zones" {
 
 
 locals {
-  network_type = "edge"
+  network_type = "polygon-edge"
   base_ami     = "ubuntu-os-cloud/ubuntu-2204-lts"
-  base_dn      = format("%s-%s-%s-private", var.deployment_name, local.network_type, var.company_name)
+  # base_dn      = format("%s-%s-%s-private", var.deployment_name, local.network_type, var.company_name)
   base_id      = format("%s-%s", var.deployment_name, var.environment)
   common_labels = {
-    environment    = lower(var.environment)
     network        = lower(local.network_type)
     owner          = lower(var.owner)
     deployment_name = lower(var.deployment_name)
-    base_dn         = lower(local.base_dn)
-    name           = lower(local.base_id)
+    environment    = lower(var.environment)
+    base_id           = lower(local.base_id)
+    # base_dn         = lower(local.base_dn)
   }
 }
 
@@ -170,36 +151,33 @@ provider "google" {
 }
 
 
-resource "google_compute_network" "network" {
-  name = "${local.base_id}-network"
-  # labels = local.common_labels
-  auto_create_subnetworks = false
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+# resource "google_compute_network" "network" {
+#   name = "${local.base_id}-network"
+#   # labels = local.common_labels
+#   auto_create_subnetworks = false
+# }
 
-resource "google_compute_subnetwork" "subnet" {
-  count = length(var.zones)
+# resource "google_compute_subnetwork" "subnet" {
+#   count = length(var.zones)
 
-  name          = "${local.base_id}-subnet-${count.index}"
-  ip_cidr_range = "10.0.${count.index}.0/24"
-  region        = var.region
-  network       = google_compute_network.network.self_link
-  private_ip_google_access = true
+#   name          = "${local.base_id}-subnet-${count.index}"
+#   ip_cidr_range = "10.0.${count.index}.0/24"
+#   region        = var.region
+#   network       = google_compute_network.network.self_link
+#   private_ip_google_access = true
 
-  depends_on = [google_compute_network.network]
+#   depends_on = [google_compute_network.network]
 
-  secondary_ip_range {
-    range_name    = "pods"
-    ip_cidr_range = "10.1.${count.index}.0/24"
-  }
+#   secondary_ip_range {
+#     range_name    = "pods"
+#     ip_cidr_range = "10.1.${count.index}.0/24"
+#   }
 
-  secondary_ip_range {
-    range_name    = "services"
-    ip_cidr_range = "10.2.${count.index}.0/24"
-  }
-}
+#   secondary_ip_range {
+#     range_name    = "services"
+#     ip_cidr_range = "10.2.${count.index}.0/24"
+#   }
+# }
 
 
 resource "google_compute_instance" "validator" {
@@ -210,40 +188,88 @@ resource "google_compute_instance" "validator" {
   boot_disk {
     initialize_params {
       image = local.base_ami
+      labels       = merge(local.common_labels, {
+        role = "validator"
+        node_name = "validator-${count.index}"
+      })
     }
   }
 
   network_interface {
     network = google_compute_network.network.self_link
-    subnetwork = google_compute_subnetwork.subnet[count.index % length(var.zones)].self_link
+    subnetwork = google_compute_subnetwork.private.self_link
   }
-  labels       = local.common_labels
+  attached_disk {
+    source = google_compute_disk.validator[count.index].self_link
+  }
+
+  labels       = merge(local.common_labels, {
+    role = "validator"
+    node_name = "validator-${count.index}"
+  })
+}
+
+# now let's create a few disks for the validators
+resource "google_compute_disk" "validator" {
+  count = var.validator_count
+  name  = "${local.base_id}-validator-disk-${count.index}"
+  type  = "pd-standard"
+  zone  = var.zones[count.index % length(var.zones)]
+  size  = var.node_storage
+  labels       = merge(local.common_labels, {
+    role = "validator"
+    node_name = "validator-${count.index}"
+  })
+}
+
+# now the geth nodes
+resource "google_compute_instance" "geth" {
+  count = var.geth_count
+  name         = "${local.base_id}-geth-${count.index}"
+  machine_type = var.base_instance_type
+  zone         = var.zones[count.index % length(var.zones)]
+  boot_disk {
+    initialize_params {
+      image = local.base_ami
+      labels       = merge(local.common_labels, {
+        role = "geth"
+        node_name = "geth-${count.index}"
+      })
+    }
+  }
+
+  network_interface {
+    network = google_compute_network.network.self_link
+    subnetwork = google_compute_subnetwork.private.self_link
+  }
+  attached_disk {
+    source = google_compute_disk.geth[count.index].self_link
+  }
+
+  labels       = merge(local.common_labels, {
+    role = "geth"
+    node_name = "geth-${count.index}"
+  })
+}
+
+# now let's create a few disks for the geth nodes
+resource "google_compute_disk" "geth" {
+  count = var.geth_count
+  name  = "${local.base_id}-geth-disk-${count.index}"
+  type  = "pd-standard"
+  zone  = var.zones[count.index % length(var.zones)]
+  size  = var.node_storage
+  labels       = merge(local.common_labels, {
+    role = "geth"
+    node_name = "geth-${count.index}"
+  })
 }
 
 
-# output "gcp_lb_int_rpc_domain" {
-#   value = module.elb.gcp_lb_int_rpc_domain
-# }
 
-# output "gcp_lb_ext_domain" {
-#   value = module.elb.gcp_lb_ext_rpc_domain
-# }
 
-# output "gcp_lb_ext_geth_domain" {
-#   value = module.elb.gcp_lb_ext_rpc_geth_domain
-# }
 
-# output "base_dn" {
-#   value = local.base_dn
-# }
-# output "base_id" {
-#   value = local.base_id
-# }
-# output "pk_ansible" {
-#   value     = module.ec2.pk_ansible
-#   sensitive = true
-# }
 
-# output "geth_private_ip" {
-#   value     = module.ec2.geth_private_ips[0]
-# }
+
+
+
