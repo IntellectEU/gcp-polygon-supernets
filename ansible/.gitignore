@@ -1,2 +1,3 @@
 password.txt
-#local-extra-vars.yml
+ansible/roles/edge/templates/bootstrap-2.sh
+ansible/hostvars[inventory_hostname].json

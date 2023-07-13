@@ -9,33 +9,9 @@
 - name: Execute bootstrap on the first validator
   ansible.builtin.shell: |
     {{ edge_home_dir }}/init.sh 2>&1 > {{ edge_home_dir }}/bootstrap_output.txt
-  when: hostvars[inventory_hostname].tags["Hostname"] == "validator-001"
+  when: hostvars[inventory_hostname].labels.node_name == "validator-1"
   args:
     executable: /bin/bash
-
-- name: Produce package.json
-  ansible.builtin.template:
-    src: package.json
-    dest: "/var/lib/bootstrap/package.json"
-    mode: 0700
-  when: hostvars[inventory_hostname].tags["Hostname"] == "validator-001"
-
-- name: Produce deploy and run script
-  ansible.builtin.template:
-    src: deploy-and-run.js
-    dest: "/var/lib/bootstrap/deploy-and-run.js"
-    mode: 0700
-  when: hostvars[inventory_hostname].tags["Hostname"] == "validator-001"
-
-# Example MockERC20 Token deployment
-# - name: Execute deploy and run script on the first validator
-#   ansible.builtin.shell: |
-#     cd /var/lib/bootstrap
-#     export PRIVATE_KEY=$(cat rootchain-wallet.json | jq -r '.HexPrivateKey')
-#     export NATIVE_ERC20_ADDR=$(cat genesis.json | jq -r '.params.engine.polybft.bridge.nativeERC20Address')
-#     npm install
-#     node /var/lib/bootstrap/deploy-and-run.js > /var/lib/bootstrap/run-deploy-output.txt
-#   when: hostvars[inventory_hostname].tags["Hostname"] == "validator-001"
 
 - name: Copy the bootstrap data to local
   block:
@@ -44,7 +20,7 @@
         src: /var/lib/bootstrap/{{ base_dn }}.tar.gz
         dest: /tmp/{{ base_dn }}.tar.gz
         flat: true
-      when: hostvars[inventory_hostname].tags["Hostname"] == "validator-001"
+      when: hostvars[inventory_hostname].labels.node_name == "validator-1"
     - name: Create a folder to hold the bootstrap archive
       ansible.builtin.file:
         path: "{{ edge_home_dir }}/bootstrap"
@@ -69,7 +45,7 @@
   block:
     - name: Copy consensus directory
       ansible.builtin.copy:
-        src: "{{ edge_home_dir }}/bootstrap/{{ hostvars[inventory_hostname].tags['Name'] }}/consensus"
+        src: "{{ edge_home_dir }}/bootstrap/{{ hostvars[inventory_hostname].labels.node_name }}/consensus"
         dest: "{{ edge_home_dir }}"
         owner: "{{ edge_user }}"
         group: "{{ edge_user }}"
@@ -77,7 +53,7 @@
         remote_src: true
     - name: Copy libp2p directory
       ansible.builtin.copy:
-        src: "{{ edge_home_dir }}/bootstrap/{{ hostvars[inventory_hostname].tags['Name'] }}/libp2p"
+        src: "{{ edge_home_dir }}/bootstrap/{{ hostvars[inventory_hostname].labels.node_name }}/libp2p"
         dest: "{{ edge_home_dir }}"
         owner: "{{ edge_user }}"
         group: "{{ edge_user }}"

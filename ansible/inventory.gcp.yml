@@ -21,7 +21,7 @@ projects:
   - polygon-060623
 
 auth_kind: serviceaccount
-service_account_file: /Users/noel/Downloads/polygon-060623-62ee6690d9c1.json
+service_account_file: /Users/diogosaraiva/Downloads/polygon-060623-62ee6690d9c1.json
 # plugin: amazon.aws.aws_ec2
 
 

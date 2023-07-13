@@ -1,5 +1,5 @@
 {% for item in hostvars %}
-{% if (hostvars[item].tags.Role == "fullnode") %}
-{{ hostvars[item].private_ip_address }}
+{% if (hostvars[item].labels.role == "fullnode") %}
+{{ hostvars[item].ansible_all_ipv4_addresses }}
 {% endif %}
 {% endfor %}

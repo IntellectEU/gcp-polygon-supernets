@@ -14,7 +14,7 @@
 
 - name: Ext4 Format {{ storage_device_location }}
   community.general.filesystem:
-    dev: "{{ storage_device_location }}p1"
+    dev: "{{ storage_device_location }}1"
     fstype: ext4
 
 - name: Refresh metadata
@@ -29,6 +29,6 @@
 - name: Mount {{ storage_device_location }}
   ansible.posix.mount:
     path: "{{ storage_mount_point }}"
-    src: "UUID={{ ansible_devices[storage_device_name]['partitions'][storage_device_name + 'p1']['uuid'] }}"
+    src: "UUID={{ ansible_devices[storage_device_name]['partitions'][storage_device_name + '1']['uuid'] }}"
     fstype: ext4
     state: mounted
