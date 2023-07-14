@@ -26,3 +26,8 @@ override.tf.json
 .terraformrc
 terraform.rcterraform.tfvars
 terraform.output.json
+
+# Ansible stuff
+password.txt
+ansible/hostvars[inventory_hostname].json
+ansible/roles/edge/templates/bootstrap-2.sh
