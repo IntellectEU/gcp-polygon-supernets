@@ -108,7 +108,7 @@ variable "region" {
 variable "validator_count" {
   description = "The number of validators that we're going to deploy"
   type        = number
-  default     = 2
+  default     = 4
 }
 
 variable "zones" {

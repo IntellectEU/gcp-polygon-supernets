@@ -47,7 +47,7 @@ native_token_config: MyToken:MTK:18:true # configuration of native token in form
 ansible_ssh_private_key_file: /Users/diogosaraiva/.ssh/google_compute_engine
 # ansible_user: ubuntu
 ansible_become: true
-# ansible_ssh_retries: 5
+ansible_ssh_retries: 3
 
 
 # deployment_name: "{{ clean_deploy_title }}"

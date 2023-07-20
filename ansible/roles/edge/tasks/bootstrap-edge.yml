@@ -9,7 +9,7 @@
 - name: Execute bootstrap on the first validator
   ansible.builtin.shell: |
     {{ edge_home_dir }}/init.sh 2>&1 > {{ edge_home_dir }}/bootstrap_output.txt
-  when: hostvars[inventory_hostname].labels.node_name == "validator-1"
+  when: hostvars[inventory_hostname].labels.node_name == "validator-0"
   args:
     executable: /bin/bash
 
@@ -20,7 +20,7 @@
         src: /var/lib/bootstrap/{{ base_dn }}.tar.gz
         dest: /tmp/{{ base_dn }}.tar.gz
         flat: true
-      when: hostvars[inventory_hostname].labels.node_name == "validator-1"
+      when: hostvars[inventory_hostname].labels.node_name == "validator-0"
     - name: Create a folder to hold the bootstrap archive
       ansible.builtin.file:
         path: "{{ edge_home_dir }}/bootstrap"
