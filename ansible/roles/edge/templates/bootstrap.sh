@@ -36,7 +36,7 @@ main() {
     polygon-edge genesis \
                  --consensus polybft \
                  --chain-id {{ chain_id }} \
-                 {% for item in hostvars %}{% if (hostvars[item].labels.role == "fullnode" or hostvars[item].labels.role == "validator") %} --bootnode /dns4/{{ hostvars[item].labels.node_name }}/tcp/{{ edge_p2p_port }}/p2p/$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].node_id') {% endif %}{% endfor %} \
+                 {% for item in hostvars %}{% if (hostvars[item].labels.role == "fullnode" or hostvars[item].labels.role == "validator") %} --bootnode /dns4/{{ hostvars[item].inventory_hostname }}/tcp/{{ edge_p2p_port }}/p2p/$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].node_id') {% endif %}{% endfor %} \
                  {% for item in hostvars %}{% if (hostvars[item].labels.role == "fullnode" or hostvars[item].labels.role == "validator") %} --premine $(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].address'):1000000000000000000000000 {% endif %}{% endfor %} \
                  --premine {{ loadtest_account }}:1000000000000000000000000000 \
                  --premine $BURN_CONTRACT_ADDRESS \
@@ -46,7 +46,7 @@ main() {
                  --reward-wallet 0x0101010101010101010101010101010101010101:1000000000000000000000000000 \
                  --block-gas-limit {{ block_gas_limit }} \
                  --block-time {{ block_time }}s \
-                 {% for item in hostvars %}{% if (hostvars[item].labels.role == "validator") %} --validators /dns4/{{ hostvars[item].labels.node_name }}/tcp/{{ edge_p2p_port }}/p2p/$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].node_id'):$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].address' | sed 's/^0x//'):$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].bls_pubkey') {% endif %}{% endfor %} \
+                 {% for item in hostvars %}{% if (hostvars[item].labels.role == "validator") %} --validators /dns4/{{ hostvars[item].inventory_hostname }}/tcp/{{ edge_p2p_port }}/p2p/$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].node_id'):$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].address' | sed 's/^0x//'):$(cat {{ hostvars[item].labels.node_name }}.json | jq -r '.[0].bls_pubkey') {% endif %}{% endfor %} \
                  --epoch-size 10 \
                  --native-token-config {{ native_token_config }}:$(cat rootchain-wallet.json | jq -r '.ETHAddress')
     polygon-edge polybft stake-manager-deploy \
@@ -80,7 +80,7 @@ main() {
 
     #              --private-key $(cat rootchain-wallet.json | jq -r '.HexPrivateKey') \
 
-    counter=1
+    counter=0
 {% for item in hostvars %}
 {% if (hostvars[item].labels.role == "validator") %}
     echo "Registering validator: ${counter}"
