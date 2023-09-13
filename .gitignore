@@ -31,3 +31,6 @@ terraform.output.json
 password.txt
 ansible/hostvars[inventory_hostname].json
 ansible/roles/edge/templates/bootstrap-2.sh
+
+### SA ###
+polygon*.json 
