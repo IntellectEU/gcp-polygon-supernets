@@ -99,7 +99,7 @@ variable "boot_disk_size" {
   default     = 10
 }
 
-### Not being used right now ###
+### Further development: Not being used right now ###
 variable "rootchain_rpc_port" {
   description = "The TCP port that will be used for rootchain (for bridge)"
   type        = number
