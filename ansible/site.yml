@@ -23,13 +23,29 @@
   roles:
     - rootchain-server
 
-- name: Install mounted-storage and edge roles
+- name: Install mounted-storage
+  hosts: fullnode:validator
+  become: true
+
+  tasks:
+    - name: Check if Disk Exists
+      ansible.builtin.shell: lsblk "{{ storage_device_location }}"
+      ignore_errors: yes  # Ignore errors if the disk doesn't exist
+      register: disk_exists
+
+    - name: Run Role if Disk Exists
+      include_role:
+        name: mounted-storage
+      when: disk_exists.rc == 0
+  tags:
+    - edge
+
+- name: Install edge roles
   hosts: fullnode:validator
   become: true
   tags:
     - edge
   roles:
-    - mounted-storage
     - edge
 
 - name: Install haproxy role

@@ -1,8 +1,16 @@
 ---
 ansible_ssh_common_args: "-o ProxyCommand='gcloud compute start-iap-tunnel %h %p --listen-on-stdin --zone {{ zone }} --project {{ project }}'"
 
-### New ###
-clean_deploy_title: devnet13
+### Add your user and your ssh key to GCP Console and refer it here
+ansible_user: diogosaraiva
+ansible_ssh_private_key_file: ~/.ssh/google_compute_engine
+
+ansible_become: true
+ansible_ssh_retries: 3
+
+clean_deploy_title: gp23-poc3
+environment: devnet
+project: polygon-060623
 
 block_gas_limit: 50_000_000
 block_time: 5
@@ -22,8 +30,7 @@ rootchain_deployer_fund_amount: 10000000ether
 # rootchain_validator_fund_amount: 1ether
 
 # this is the rpc url that will be used for the root chain
-rootchain_json_rpc: http://gp23-poc3-devnet-geth-0.c.polygon-060623.internal:8545
-# rootchain_json_rpc: https://matic-mumbai.chainstacklabs.com
+rootchain_json_rpc: "http://{{ base_id }}-geth-0.c.{{ project }}.internal:8545"
 
 # When our l1 is geth with an unlocked account, we'll need to send
 # ether from the randomly created coinbase to our predetermined
@@ -44,13 +51,6 @@ enable_eip_1559: false
 # The flag for your custom native token config
 native_token_config: MyToken:MTK:18:true # configuration of native token in format <name:symbol:decimals count:mintable flag>
 
-ansible_ssh_private_key_file: /Users/diogosaraiva/.ssh/google_compute_engine
-# ansible_user: ubuntu
-ansible_become: true
-ansible_ssh_retries: 3
-
-
-# deployment_name: "{{ clean_deploy_title }}"
 deployment_name: "{{ clean_deploy_title }}"
 base_dn: "{{ deployment_name }}.edge.polygon.private"
 base_id: "{{ deployment_name }}-{{ environment }}"

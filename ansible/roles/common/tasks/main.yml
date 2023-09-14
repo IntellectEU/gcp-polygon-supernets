@@ -77,4 +77,16 @@
   args:
     creates: /usr/local/bin/cast
 
+- name: Update journald.conf
+  ansible.builtin.replace:
+    path: /etc/systemd/journald.conf
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - { regexp: '^#?SystemMaxUse=', replace: 'SystemMaxUse=500M' }
+    - { regexp: '^#?SystemKeepFree=', replace: 'SystemKeepFree=100M' }
 
+- name: Restart systemd-journald
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted

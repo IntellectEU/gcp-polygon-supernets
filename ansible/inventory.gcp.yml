@@ -15,32 +15,14 @@ groups:
   fullnode: "'fullnode' in name"
   geth: "'geth' in name"
 hostnames:
-  # List host by name instead of the default public ip
   - name
 projects:
   - polygon-060623
 
 auth_kind: serviceaccount
-service_account_file: /Users/diogosaraiva/Downloads/polygon-060623-62ee6690d9c1.json
-# plugin: amazon.aws.aws_ec2
-
-
-# keyed_groups:
-#   - key: tags.Role
-#     seperator: ""
-#   - key: tags.BaseDN
-#     seperator: ""
-#   - key: tags.Hostname
-#     seperator: ""
-
-# removes leading "_" note value _meta is a system value not tagged on any instances
-# requires ansible version>=2.11
-# leading_separator: "no"
+service_account_file: ../terraform/polygon-sa.json
 
 cache: "yes"
 
 filters:
   - "labels.network = polygon-edge"
-
-# hostnames:
-#   - instance-id
