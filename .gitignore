@@ -1,36 +1,23 @@
-.DS_Store
-private.env
+### Keys and SA ###
+polygon*.json 
 *.key
 *.pem
-# Local .terraform directories
+
+### Local .terraform directories ###
 **/.terraform/*
 
-# .tfstate files
+### .tfstate files ###
 *.tfstate
 *.tfstate.*
 
-# Crash log files
-crash.log
-
-# Ignore any .tfvars files that are automatically generated
+### Ignore any .tfvars files that are automatically generated ###
 *.auto.tfvars
 *.tfvars.json
 
-# Ignore override files as they are usually used to override resources locally and not checked in
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
-# Ignore CLI configuration files
-.terraformrc
-terraform.rcterraform.tfvars
-terraform.output.json
-
-# Ansible stuff
+### Ansible stuff ###
 password.txt
 ansible/hostvars[inventory_hostname].json
-ansible/roles/edge/templates/bootstrap-2.sh
 
-### SA ###
-polygon*.json 
+### Other files ###
+.DS_Store
+private.env

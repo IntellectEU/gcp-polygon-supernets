@@ -11,7 +11,7 @@ output "service_account_email" {
 }
 
 output "polygon_sa_key" {
-  value = base64decode(google_service_account_key.polygon_sa.private_key)
+  value     = base64decode(google_service_account_key.polygon_sa.private_key)
   sensitive = true
 }
 

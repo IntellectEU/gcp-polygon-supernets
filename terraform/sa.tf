@@ -22,5 +22,5 @@ resource "google_project_iam_binding" "polygon_sa_binding" {
 
 resource "local_file" "polygon_sa_key" {
   filename = "polygon-sa.json"
-  content  = "${base64decode(google_service_account_key.polygon_sa.private_key)}"
+  content  = base64decode(google_service_account_key.polygon_sa.private_key)
 }
