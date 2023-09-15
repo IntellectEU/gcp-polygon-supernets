@@ -1,11 +1,14 @@
-- name: Gather facts
-  hosts: all
+- hosts: all
   become: true
   tags:
     - always
   tasks:
     - name: Gather facts
       ansible.builtin.gather_facts:
+      retries: 3
+      delay: 10
+      register: result
+      until: result is not failed
 
 - name: Install common role
   hosts: all
@@ -55,4 +58,3 @@
     - haproxy
   roles:
     - haproxy
-
