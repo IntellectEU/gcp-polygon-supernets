@@ -2,7 +2,7 @@
 ansible_ssh_common_args: "-o ProxyCommand='gcloud compute start-iap-tunnel %h %p --listen-on-stdin --zone {{ zone }} --project {{ project }}'"
 
 ### Add your user and your ssh key to GCP Console and refer it here
-ansible_user: diogosaraiva
+ansible_user: YOUR_USER
 ansible_ssh_private_key_file: ~/.ssh/google_compute_engine
 
 ansible_become: true
@@ -77,7 +77,6 @@ node_exporter_web_listen_address: 127.0.0.1:{{ node_exporter_port }}
 haproxy_port: 10222
 
 # This is the configuration related to mounting a separate device
-# storage_device_name: nvme1n1
 storage_device_name: sdb
 storage_device_location: /dev/{{ storage_device_name }}
 storage_mount_point: "{{ edge_home_dir }}"

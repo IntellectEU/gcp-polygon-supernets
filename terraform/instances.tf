@@ -1,3 +1,9 @@
+resource "google_project_service" "compute" {
+  service = "compute.googleapis.com"
+
+  disable_on_destroy = false
+}
+
 ### Launching Validators - minimum 4 ###
 resource "google_compute_instance" "validator" {
   count        = var.validator_count

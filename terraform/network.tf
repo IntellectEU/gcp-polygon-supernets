@@ -1,9 +1,3 @@
-resource "google_project_service" "compute" {
-  service = "compute.googleapis.com"
-
-  disable_on_destroy = false
-}
-
 resource "google_compute_network" "network" {
   name                            = "${local.base_id}-network"
   routing_mode                    = "REGIONAL"

@@ -1,7 +1,7 @@
 # TODOs
 
 - terraform
-  - enable gcp apis                                                 --- I have to check which APIs were Enabled
+  - enable gcp apis                                                 --- DONE
   - generate service account and service account key                --- DONE
   - generate ssh and add it to the gcp project metadata             --- Manual step
   - load balancers                                                  --- Not going to be DONE
