@@ -17,14 +17,15 @@ Then, it is used ansible to provision them. It is inspired by [terraform-polygon
 - python
 - gcloud 
 
-## The very rough steps
+## Deployment Steps
 
 1. Clone the repo
-2. Go to the terraform directory
+2. Go to the `terraform` directory
 3. Run `terraform init`
 4. Run `terraform apply`
 5. Wait for the instances to be booted
 6. Add your ssh key to the project metadata 
 7. Ensure you can connect to the hosts using `gcloud compute ssh VM_NAME --tunnel-through-iap --zone ZONE --project PROJECT_ID`
 8. Go to `ansible/group_vars/all.yml` and update the following variables accordingly: `ansible_user: YOUR_USER` and `ansible_ssh_private_key_file: PATH_TO_YOUR_KEY`
-9. Run `ansible-playbook --inventory inventory.gcp.yml site.yml` to provision the hosts
+9. Go to the `ansible` directory
+10. Run `ansible-playbook --inventory inventory.gcp.yml site.yml` to provision the hosts
