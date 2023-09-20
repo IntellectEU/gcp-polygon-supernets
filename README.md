@@ -131,9 +131,17 @@ gp23-poc3-devnet-validator-2 : ok=54   changed=36   unreachable=0    failed=0   
 gp23-poc3-devnet-validator-3 : ok=54   changed=36   unreachable=0    failed=0    skipped=6    rescued=0    ignored=1 
 ```
 
-You can delete everything you created by running from the terraform folder
+Congratulations you know have supernets running on your Google Cloud Account!
+
+You can delete everything you created by running:
 
 ```bash
 cd ~/gcp-polygon-supernets/terraform
 terraform destroy
+```
+
+Once finished output should be similar to:
+
+```
+Destroy complete! Resources: 18 destroyed.
 ```
