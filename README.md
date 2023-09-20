@@ -15,7 +15,11 @@ Then, it is used ansible to provision them. It is inspired by [terraform-polygon
 - Google Cloud Platform account
 
 ## Deployment Steps
-The following steps are for a clean Debian based system.
+The following steps are for a clean Debian based system. If you have docker installed you can create one and enter it with one command:
+
+```bash
+docker run -it debian:latest /bin/bash
+```
 
 #### Update and upgrade system
 ```bash
@@ -31,9 +35,7 @@ apt install git ansible apt-transport-https ca-certificates gnupg curl sudo wget
 [Full instructions here](https://www.hashicorp.com/official-packaging-guide?product_intent=terraform)
 ```bash
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-
 apt update && apt install terraform
 ```
 
@@ -45,16 +47,15 @@ curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyr
 sudo apt-get update && sudo apt-get install google-cloud-cli
 ```
 
-#### Initiate your Google Cloud Account and authoratize access to i
+#### Initiate your Google Cloud Account and authoratize access
 ```bash
 gcloud init
 gcloud auth application-default login
-
 ```
 
-Note: Currently configured for GCP Region "europe-west1-b".
+Note: Currently configured for GCP Region `europe-west1-b`.
 
-Output similar to:
+Output should be similar to:
 
 ```
 Quota project "mycoolproject" was added to ADC which can be used by Google client libraries for billing and quota. Note that some services may still bill the project owning the resource.
@@ -63,18 +64,16 @@ Quota project "mycoolproject" was added to ADC which can be used by Google clien
 #### Clone repo and enter terraform folder
 
 ```bash
-git clone https://github.com/IntellectEU/gcp-polygon-supernets
-cd gcp-polygon-supernets/terraform/
+git clone https://github.com/IntellectEU/gcp-polygon-supernets ~/gcp-polygon-supernets
+cd ~/gcp-polygon-supernets/terraform/
 ```
-
-
 
 #### Init and apply terraform
 ```bash
 terraform init
 ```
 
-Expected output:
+Expected output similar to:
 
 ```
 Terraform has been successfully initialized!
@@ -88,35 +87,53 @@ rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-```
+Then run:
+
+```bash
 terraform apply
 ```
 
-Expected output similar to 
+Expected output similar to:
+
 ```
 Apply complete! Resources: 18 added, 0 changed, 0 destroyed.
-
 ```
-If you login to your Google Cloud Console you should see 5 new instances created.
 
+If you login to your Google Cloud Console you should see 5 new instances created.
 
 #### Ensure you can connect to the hosts
 
 ```bash
 gcloud compute ssh --zone "europe-west1-b" "gp23-poc3-devnet-validator-0" --tunnel-through-iap --project "mycoolproject"
 ```
-Rename the project to your own project. This will also generate and upload an ssh key if you don't already have one.
 
+Rename the project `mycoolproject` to your own project. This will also generate and upload an ssh key if you don't already have one.
 
 #### Add your current user to the ansible yaml file.
 ```bash
-sed -i.bak "s/YOUR_USER/$(whoami)/g" /gcp-polygon-supernets/ansible/group_vars/all.yml
+sed -i.bak "s/YOUR_USER/$(whoami)/g" ~/gcp-polygon-supernets/ansible/group_vars/all.yml
 ```
 
 #### Run ansible-playbook from the ansible directory
 ```bash
-cd /gcp-polygon-supernets/ansible
+cd ~/gcp-polygon-supernets/ansible
 ansible-playbook --inventory inventory.gcp.yml site.yml
 ```
 
-This last process will take a long time so please be patient. 
+This last process will take a long time so please be patient (up to an hour).
+Once finished, you should see something similar to this:
+```
+PLAY RECAP ****************************************************************************************************************************************************************************
+gp23-poc3-devnet-geth-0    : ok=43   changed=27   unreachable=0    failed=0    skipped=3    rescued=0    ignored=0   
+gp23-poc3-devnet-validator-0 : ok=56   changed=38   unreachable=0    failed=0    skipped=4    rescued=0    ignored=1   
+gp23-poc3-devnet-validator-1 : ok=54   changed=36   unreachable=0    failed=0    skipped=6    rescued=0    ignored=1   
+gp23-poc3-devnet-validator-2 : ok=54   changed=36   unreachable=0    failed=0    skipped=6    rescued=0    ignored=1   
+gp23-poc3-devnet-validator-3 : ok=54   changed=36   unreachable=0    failed=0    skipped=6    rescued=0    ignored=1 
+```
+
+You can delete everything you created by running from the terraform folder
+
+```bash
+cd ~/gcp-polygon-supernets/terraform
+terraform destroy
+```
