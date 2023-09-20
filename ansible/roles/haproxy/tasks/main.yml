@@ -6,7 +6,6 @@
       - haproxy
     state: latest # noqa package-latest
     update_cache: true
-  when: ansible_distribution == "Ubuntu"
 
 - name: Create HAProxy Config
   ansible.builtin.template:
