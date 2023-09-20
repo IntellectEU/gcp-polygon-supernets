@@ -1,5 +1,5 @@
 # gcp-polygon-supernets
-The gcp-polygon-supernets is a repository where you can deploy the polygon supernets on GCP. The version supported is the v1.0.1 for the edge and v1.12.0 for geth.
+The gcp-polygon-supernets is a repository where you can deploy the [polygon supernets](https://wiki.polygon.technology/docs/supernets/) on [Google Cloud Platform](https://cloud.google.com). The version tested is the v1.0.1 for the edge and v1.12.0 for geth.
 
 This project uses terraform to deploy 4 validator nodes and 1 rootchain called geth. Each one are deployed in a GCP instance.
 Then, it is used ansible to provision them. It is inspired by [terraform-polygon-supernets](https://github.com/maticnetwork/terraform-polygon-supernets), used to deploy the polygon supernets on AWS.
